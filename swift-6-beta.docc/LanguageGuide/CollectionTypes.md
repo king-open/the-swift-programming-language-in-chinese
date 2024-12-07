@@ -1,281 +1,124 @@
-<!--
-要翻译的文件：https://github.com/SwiftGGTeam/the-swift-programming-language-in-chinese/blob/swift-6-beta-translation/swift-6-beta.docc/LanguageGuide/CollectionTypes.md
-Swift 文档源文件地址：https://docs.swift.org/swift-book/documentation/the-swift-programming-language/collectiontypes
-翻译估计用时：⭐️⭐️⭐️⭐️⭐️
--->
+# 集合类型
 
-# Collection Types
+使用数组、集合和字典来组织数据。
 
-Organize data using arrays, sets, and dictionaries.
-
-Swift provides three primary *collection types*,
-known as arrays, sets, and dictionaries,
-for storing collections of values.
-Arrays are ordered collections of values.
-Sets are unordered collections of unique values.
-Dictionaries are unordered collections of key-value associations.
+Swift 语言提供数组（Array）、集合（Set）和字典（Dictionary）三种基本的集合类型用来存储集合数据。数组是有序数据的集。集合是无序无重复数据的集。字典是无序的键值对的集。
 
 ![](CollectionTypes_intro)
 
-Arrays, sets, and dictionaries in Swift are always clear about
-the types of values and keys that they can store.
-This means that you can't insert a value of the wrong type
-into a collection by mistake.
-It also means you can be confident about the type of values
-you will retrieve from a collection.
+Swift 中的数组、集合和字典必须明确其中保存的键和值类型，这样就可以避免插入一个错误数据类型的值。同理，对于获取到的值你也可以放心，其数据类型是确定的。
 
-> Note: Swift's array, set, and dictionary types are implemented as *generic collections*.
-> For more about generic types and collections, see <doc:Generics>.
+> 注意: Swift 的数组、集合和字典类型被实现为泛型集合。更多关于泛型类型和集合，参见 *泛型 *。
+> 关于泛型类型和集合的更多信息,请参见 <doc:Generics>.
 
-<!--
-  TODO: should I mention the Collection protocol, to which both of these conform?
--->
 
-<!--
-  TODO: mention for i in indices(collection) { collection[i] }
--->
 
-<!--
-  TODO: discuss collection equality
--->
+## 集合的可变性
 
-## Mutability of Collections
+如果创建一个数组、集合或字典并且把它分配成一个变量，这个集合将会是*可变*的。这意味着可以在创建之后添加、修改或者删除数据项。如果把数组、集合或字典分配成常量，那么它就是*不可变*的，它的大小和内容都不能被改变。
 
-If you create an array, a set, or a dictionary, and assign it to a variable,
-the collection that's created will be *mutable*.
-This means that you can change (or *mutate*) the collection after it's created
-by adding, removing, or changing items in the collection.
-If you assign an array, a set, or a dictionary to a constant,
-that collection is *immutable*,
-and its size and contents can't be changed.
+> 注意：创建不可变集合是一个很好的实践，所有不需要改变的集合都应该创建成不可变的。这样做可以让你的代码更容易理解，并且可以让 Swift 编译器优化创建集合的性能。
 
-> Note: It's good practice to create immutable collections
-> in all cases where the collection doesn't need to change.
-> Doing so makes it easier for you to reason about your code
-> and enables the Swift compiler to optimize the performance of
-> the collections you create.
 
-## Arrays
+## 数组
 
-An *array* stores values of the same type in an ordered list.
-The same value can appear in an array multiple times at different positions.
+*数组*使用有序列表存储同一类型的多个值。相同的值可以多次出现在一个数组的不同位置中
 
-> Note: Swift's `Array` type is bridged to Foundation's `NSArray` class.
+> Note: Swift 的 `Array` 类型被桥接到 Foundation 中的 `NSArray` 类。
 >
-> For more information about using `Array` with Foundation and Cocoa,
-> see [Bridging Between Array and NSArray](https://developer.apple.com/documentation/swift/array#2846730).
+> 更多关于在 Foundation 和 Cocoa 中使用 `Array` 的信息，参见 [Bridging Between Array and NSArray](https://developer.apple.com/documentation/swift/array#2846730).
 
-### Array Type Shorthand Syntax
+### 数组的简单语法
 
-The type of a Swift array is written in full as `Array<Element>`,
-where `Element` is the type of values the array is allowed to store.
-You can also write the type of an array in shorthand form as `[Element]`.
-Although the two forms are functionally identical,
-the shorthand form is preferred
-and is used throughout this guide when referring to the type of an array.
+Swift 中数组的完整写法为 `Array<Element>` ，其中 `Element` 是这个数组中唯一允许存在的数据类型。也可以使用像 `[Element]` 这样的简单语法。尽管两种形式在功能上是一样的，但是推荐较短的那种，而且在本文中都会使用这种形式来使用数组。
 
-### Creating an Empty Array
+### 创建一个空数组
 
-You can create an empty array of a certain type
-using initializer syntax:
+你可以使用构造语法来创建一个由特定数据类型构成的空数组：
 
 ```swift
 var someInts: [Int] = []
 print("someInts is of type [Int] with \(someInts.count) items.")
-// Prints "someInts is of type [Int] with 0 items."
+// 打印 "someInts is of type [Int] with 0 items."
 ```
 
-<!--
-  - test: `arraysEmpty`
 
-  ```swifttest
-  -> var someInts: [Int] = []
-  -> print("someInts is of type [Int] with \(someInts.count) items.")
-  <- someInts is of type [Int] with 0 items.
-  ```
--->
+注意，通过构造函数的类型，`someInts` 的值类型被推断为 `[Int]`。
 
-Note that the type of the `someInts` variable is inferred to be `[Int]`
-from the type of the initializer.
-
-Alternatively, if the context already provides type information,
-such as a function argument or an already typed variable or constant,
-you can create an empty array with an empty array literal,
-which is written as `[]`
-(an empty pair of square brackets):
+或者，如果代码上下文中已经提供了类型信息，例如一个函数参数或者一个已经定义好类型的常量或者变量，你可以使用空数组语句创建一个空数组，它的写法很简单：`[]`（一对空方括号）：
 
 ```swift
 someInts.append(3)
-// someInts now contains 1 value of type Int
+// someInts 现在包含一个 Int 值
 someInts = []
-// someInts is now an empty array, but is still of type [Int]
+// someInts 现在是空数组，但是仍然是 [Int] 类型的。
 ```
 
-<!--
-  - test: `arraysEmpty`
+### 创建一个带有默认值的数组
 
-  ```swifttest
-  -> someInts.append(3)
-  /> someInts now contains \(someInts.count) value of type Int
-  </ someInts now contains 1 value of type Int
-  -> someInts = []
-  // someInts is now an empty array, but is still of type [Int]
-  ```
--->
-
-### Creating an Array with a Default Value
-
-Swift's `Array` type also provides
-an initializer for creating an array of a certain size
-with all of its values set to the same default value.
-You pass this initializer
-a default value of the appropriate type (called `repeating`):
-and the number of times that value is repeated in the new array (called `count`):
+Swift 中的 `Array` 类型还提供一个可以创建特定大小并且所有数据都被默认的构造方法。可以把准备加入新数组的数据项数量（`count`）和适当类型的初始值（`repeating`）传入数组构造函数：
 
 ```swift
 var threeDoubles = Array(repeating: 0.0, count: 3)
-// threeDoubles is of type [Double], and equals [0.0, 0.0, 0.0]
+// threeDoubles 是一种 [Double] 数组，等价于 [0.0, 0.0, 0.0]
 ```
 
-<!--
-  - test: `arraysEmpty`
+### 通过两个数组相加创建一个数组
 
-  ```swifttest
-  -> var threeDoubles = Array(repeating: 0.0, count: 3)
-  /> threeDoubles is of type [Double], and equals [\(threeDoubles[0]), \(threeDoubles[1]), \(threeDoubles[2])]
-  </ threeDoubles is of type [Double], and equals [0.0, 0.0, 0.0]
-  ```
--->
-
-### Creating an Array by Adding Two Arrays Together
-
-You can create a new array by adding together two existing arrays with compatible types
-with the addition operator (`+`).
-The new array's type is inferred from the type of the two arrays you add together:
+你可以使用加法操作符（`+`）来组合两个已存在的相同类型数组。新数组的数据类型会从两个数组的数据类型中推断出来：
 
 ```swift
 var anotherThreeDoubles = Array(repeating: 2.5, count: 3)
-// anotherThreeDoubles is of type [Double], and equals [2.5, 2.5, 2.5]
+// anotherThreeDoubles 被推断为 [Double]，等价于 [2.5, 2.5, 2.5]
 
 var sixDoubles = threeDoubles + anotherThreeDoubles
-// sixDoubles is inferred as [Double], and equals [0.0, 0.0, 0.0, 2.5, 2.5, 2.5]
+// sixDoubles 被推断为 [Double]，等价于 [0.0, 0.0, 0.0, 2.5, 2.5, 2.5]
 ```
 
-<!--
-  - test: `arraysEmpty`
+### 用数组字面量构造数组
 
-  ```swifttest
-  -> var anotherThreeDoubles = Array(repeating: 2.5, count: 3)
-  /> anotherThreeDoubles is of type [Double], and equals [\(anotherThreeDoubles[0]), \(anotherThreeDoubles[1]), \(anotherThreeDoubles[2])]
-  </ anotherThreeDoubles is of type [Double], and equals [2.5, 2.5, 2.5]
-  ---
-  -> var sixDoubles = threeDoubles + anotherThreeDoubles
-  /> sixDoubles is inferred as [Double], and equals \(sixDoubles)
-  </ sixDoubles is inferred as [Double], and equals [0.0, 0.0, 0.0, 2.5, 2.5, 2.5]
-  ```
--->
-
-<!--
-  TODO: func find<T: Equatable>(array: [T], value: T) -> Int?
-  This is defined in Algorithm.swift,
-  and gives a way to find the index of a value in an array if it exists.
-  I'm holding off writing about it until NewArray lands.
--->
-
-<!--
-  TODO: mutating func sort(by: (T, T) -> Bool)
-  This is defined in Array.swift.
-  Likewise I'm holding off writing about it until NewArray lands.
--->
-
-### Creating an Array with an Array Literal
-
-You can also initialize an array with an *array literal*,
-which is a shorthand way to write one or more values as an array collection.
-An array literal is written as a list of values, separated by commas,
-surrounded by a pair of square brackets:
+你可以使用`数组字面量`来进行数组构造，这是一种用一个或者多个数值构造数组的简单方法。数组字面量是一系列由逗号分割并由方括号包含的数值：
 
 ```swift
 [<#value 1#>, <#value 2#>, <#value 3#>]
 ```
 
-The example below creates an array called `shoppingList` to store `String` values:
+下面这个例子创建了一个叫做 `shoppingList` 并且存储 `String` 的数组：
 
 ```swift
 var shoppingList: [String] = ["Eggs", "Milk"]
-// shoppingList has been initialized with two initial items
+// shoppingList 已经被构造并且拥有两个初始项。
 ```
 
-<!--
-  - test: `arrays`
+`shoppingList` 变量被声明为“字符串值类型的数组“，记作 `[String]` 。因为这个数组被规定只有 `String`  一种数据结构，所以只有 String 类型可以在其中被存取。在这里，`shoppingList` 数组由两个 `String` 值（`"Eggs"` 和 `"Milk"`）构造，并且由数组字面量定义。
 
-  ```swifttest
-  -> var shoppingList: [String] = ["Eggs", "Milk"]
-  // shoppingList has been initialized with two initial items
-  ```
--->
+> 注意
 
-The `shoppingList` variable is declared as
-“an array of string values”, written as `[String]`.
-Because this particular array has specified a value type of `String`,
-it's allowed to store `String` values only.
-Here, the `shoppingList` array is initialized with two `String` values
-(`"Eggs"` and `"Milk"`), written within an array literal.
+> `shoppingList` 数组被声明为变量（`var` 关键字创建）而不是常量（`let` 创建）是因为之后会有更多的数据项被插入其中。
 
-> Note: The `shoppingList` array is declared as a variable (with the `var` introducer)
-> and not a constant (with the `let` introducer)
-> because more items are added to the shopping list in the examples below.
+在这个例子中，字面量仅仅包含两个 `String` 值。匹配了该数组的声明（只能包含 `String` 值的数组），所以可以将这个字面量的赋值过程看作用两个初始项来构造 `shoppingList` 的一种方式。
 
-In this case, the array literal contains two `String` values and nothing else.
-This matches the type of the `shoppingList` variable's declaration
-(an array that can only contain `String` values),
-and so the assignment of the array literal is permitted
-as a way to initialize `shoppingList` with two initial items.
-
-Thanks to Swift's type inference,
-you don't have to write the type of the array
-if you're initializing it with an array literal containing values of the same type.
-The initialization of `shoppingList` could have been written in a shorter form instead:
+由于 Swift 的类型推断机制，当你用字面量构造拥有相同类型值数组的时候，不必把数组的类型定义清楚。`shoppingList` 的构造也可以这样写：
 
 ```swift
 var shoppingList = ["Eggs", "Milk"]
 ```
 
-<!--
-  - test: `arraysInferred`
+因为所有数组字面量中的值都是相同的类型，Swift 可以推断出 [ `String` ] 是 `shoppingList` 中变量的正确类型。
 
-  ```swifttest
-  -> var shoppingList = ["Eggs", "Milk"]
-  ```
--->
+### 访问和修改数组
 
-Because all values in the array literal are of the same type,
-Swift can infer that `[String]` is
-the correct type to use for the `shoppingList` variable.
+你可以通过数组的方法和属性来访问和修改数组，或者使用下标语法。
 
-### Accessing and Modifying an Array
-
-You access and modify an array through its methods and properties,
-or by using subscript syntax.
-
-To find out the number of items in an array, check its read-only `count` property:
+可以使用数组的只读属性 `count` 来获取数组中的数据项数量：
 
 ```swift
 print("The shopping list contains \(shoppingList.count) items.")
-// Prints "The shopping list contains 2 items."
+// 输出“The shopping list contains 2 items.”（这个数组有2个项）
 ```
 
-<!--
-  - test: `arraysInferred`
 
-  ```swifttest
-  -> print("The shopping list contains \(shoppingList.count) items.")
-  <- The shopping list contains 2 items.
-  ```
--->
-
-Use the Boolean `isEmpty` property
-as a shortcut for checking whether the `count` property is equal to `0`:
+使用布尔属性 `isEmpty` 作为一个缩写形式去检查 `count`  属性是否为 0：
 
 ```swift
 if shoppingList.isEmpty {
@@ -283,238 +126,94 @@ if shoppingList.isEmpty {
 } else {
     print("The shopping list isn't empty.")
 }
-// Prints "The shopping list isn't empty."
+// 打印“The shopping list is not empty.”（shoppinglist 不是空的）
 ```
 
-<!--
-  - test: `arraysInferred`
-
-  ```swifttest
-  -> if shoppingList.isEmpty {
-        print("The shopping list is empty.")
-     } else {
-        print("The shopping list isn't empty.")
-     }
-  <- The shopping list isn't empty.
-  ```
--->
-
-You can add a new item to the end of an array by calling the array's `append(_:)` method:
+也可以使用 `append(_:)` 方法在数组后面添加新的数据项：
 
 ```swift
 shoppingList.append("Flour")
-// shoppingList now contains 3 items, and someone is making pancakes
+// shoppingList 现在有3个数据项，似乎有人在摊煎饼
 ```
 
-<!--
-  - test: `arraysInferred`
-
-  ```swifttest
-  -> shoppingList.append("Flour")
-  /> shoppingList now contains \(shoppingList.count) items, and someone is making pancakes
-  </ shoppingList now contains 3 items, and someone is making pancakes
-  ```
--->
-
-Alternatively, append an array of one or more compatible items
-with the addition assignment operator (`+=`):
+A除此之外，也可以使用加法赋值运算符 （`+=`）直接将另一个相同类型数组中的数据添加到该数组后面：
 
 ```swift
 shoppingList += ["Baking Powder"]
-// shoppingList now contains 4 items
+// shoppingList 现在有四项了
 shoppingList += ["Chocolate Spread", "Cheese", "Butter"]
-// shoppingList now contains 7 items
+// shoppingList 现在有七项了
 ```
 
-<!--
-  - test: `arraysInferred`
-
-  ```swifttest
-  -> shoppingList += ["Baking Powder"]
-  /> shoppingList now contains \(shoppingList.count) items
-  </ shoppingList now contains 4 items
-  -> shoppingList += ["Chocolate Spread", "Cheese", "Butter"]
-  /> shoppingList now contains \(shoppingList.count) items
-  </ shoppingList now contains 7 items
-  ```
--->
-
-Retrieve a value from the array by using *subscript syntax*,
-passing the index of the value you want to retrieve within square brackets
-immediately after the name of the array:
+可以直接使用下`标语法`来获取数组中的数据项，把所需要数据项的索引值直接放在数组名称之后的方括号中：
 
 ```swift
 var firstItem = shoppingList[0]
-// firstItem is equal to "Eggs"
+// 第一项是“Eggs”
 ```
 
-<!--
-  - test: `arraysInferred`
+>注意
 
-  ```swifttest
-  -> var firstItem = shoppingList[0]
-  /> firstItem is equal to \"\(firstItem)\"
-  </ firstItem is equal to "Eggs"
-  ```
--->
+> 第一项在数组中的索引值是 `0` 而不是 `1`。 Swift 中的数组索引总是从零开始。
 
-> Note: The first item in the array has an index of `0`, not `1`.
-> Arrays in Swift are always zero-indexed.
-
-You can use subscript syntax to change an existing value at a given index:
+你也可以用下标来改变某个有效索引值对应的数据值：
 
 ```swift
 shoppingList[0] = "Six eggs"
-// the first item in the list is now equal to "Six eggs" rather than "Eggs"
+// 其中的第一项现在是“Six eggs”而不是“Eggs”
 ```
 
-<!--
-  - test: `arraysInferred`
+当你使用下标语法，所使用的下标必须是有效的。例如，试图通过 `shoppingList[shoppingList.count] = "Salt"`  在数组的最后添加一项，将产生一个运行时错误。
 
-  ```swifttest
-  -> shoppingList[0] = "Six eggs"
-  /> the first item in the list is now equal to \"\(shoppingList[0])\" rather than \"Eggs\"
-  </ the first item in the list is now equal to "Six eggs" rather than "Eggs"
-  ```
--->
-
-When you use subscript syntax,
-the index you specify needs to be valid.
-For example, writing `shoppingList[shoppingList.count] = "Salt"`
-to try to append an item to the end of the array
-results in a runtime error.
-
-<!--
-  Unlike Ruby and Javascript, where accessing an invalid index
-  extends the array with nil or similar placeholder values,
-  to make that index become valid.
--->
-
-You can also use subscript syntax to change a range of values at once,
-even if the replacement set of values has a different length than the range you are replacing.
-The following example replaces `"Chocolate Spread"`, `"Cheese"`, and `"Butter"`
-with `"Bananas"` and `"Apples"`:
+还可以利用下标来一次改变一系列数据值，即使新数据和原有数据的数量是不一样的。下面的例子把  `"Chocolate Spread"` 、`"Cheese"` 和 `"Butter"` 替换为 `"Bananas"` 和 `"Apples"`：
 
 ```swift
 shoppingList[4...6] = ["Bananas", "Apples"]
-// shoppingList now contains 6 items
+// shoppingList 现在有6项
 ```
 
-<!--
-  - test: `arraysInferred`
 
-  ```swifttest
-  -> shoppingList[4...6] = ["Bananas", "Apples"]
-  /> shoppingList now contains \(shoppingList.count) items
-  </ shoppingList now contains 6 items
-  ```
--->
-
-To insert an item into the array at a specified index,
-call the array's `insert(_:at:)` method:
+通过调用数组的 `insert(_:at:)` 方法在某个指定索引值之前添加数据项：
 
 ```swift
 shoppingList.insert("Maple Syrup", at: 0)
-// shoppingList now contains 7 items
-// "Maple Syrup" is now the first item in the list
+// shoppingList 现在有7项
+//  现在是这个列表中的第一项是“Maple Syrup”
 ```
 
-<!--
-  - test: `arraysInferred`
+这次 `insert(_:at:)` 方法调用把值为 `"Maple Syrup"` 的新数据项插入列表的最开始位置，并且使用 `0` 作为索引值。
 
-  ```swifttest
-  -> shoppingList.insert("Maple Syrup", at: 0)
-  /> shoppingList now contains \(shoppingList.count) items
-  </ shoppingList now contains 7 items
-  /> \"\(shoppingList[0])\" is now the first item in the list
-  </ "Maple Syrup" is now the first item in the list
-  ```
--->
-
-This call to the `insert(_:at:)` method inserts a new item with a value of `"Maple Syrup"`
-at the very beginning of the shopping list,
-indicated by an index of `0`.
-
-Similarly, you remove an item from the array with the `remove(at:)` method.
-This method removes the item at the specified index and returns the removed item
-(although you can ignore the returned value if you don't need it):
+类似的可以使用 `remove(at:)` 方法来移除数组中的某一项。这个方法把数组在特定索引值中存储的数据项移除并且返回这个被移除的数据项（不需要的时候就可以无视它）：
 
 ```swift
 let mapleSyrup = shoppingList.remove(at: 0)
-// the item that was at index 0 has just been removed
-// shoppingList now contains 6 items, and no Maple Syrup
-// the mapleSyrup constant is now equal to the removed "Maple Syrup" string
+// 索引值为0的数据项被移除
+// shoppingList 现在只有6项，而且不包括 Maple Syrup
+// mapleSyrup 常量的值等于被移除数据项“Maple Syrup”"Maple Syrup" string
 ```
 
-<!--
-  - test: `arraysInferred`
 
-  ```swifttest
-  -> let mapleSyrup = shoppingList.remove(at: 0)
-  // the item that was at index 0 has just been removed
-  /> shoppingList now contains \(shoppingList.count) items, and no Maple Syrup
-  </ shoppingList now contains 6 items, and no Maple Syrup
-  /> the mapleSyrup constant is now equal to the removed \"\(mapleSyrup)\" string
-  </ the mapleSyrup constant is now equal to the removed "Maple Syrup" string
-  ```
--->
+> 注意: 如果你试图通过越界索引来执行访问或者修改数据的操作，会引发一个运行时错误。此时可以使用索引值和数组的 `count` 属性进行比较来在使用该索引之前检验其是否有效。除了当 `count` 等于 0 时（说明这是个空数组），最大索引值一直是 `count - 1`，因为数组都是零起索引。
 
-> Note: If you try to access or modify a value for an index
-> that's outside of an array's existing bounds,
-> you will trigger a runtime error.
-> You can check that an index is valid before using it
-> by comparing it to the array's `count` property.
-> The largest valid index in an array is `count - 1`
-> because arrays are indexed from zero ---
-> however, when `count` is `0` (meaning the array is empty),
-> there are no valid indexes.
-
-Any gaps in an array are closed when an item is removed,
-and so the value at index `0` is once again equal to `"Six eggs"`:
+数据项被移除后数组中的空出项会被自动填补，所以现在索引值为 `0` 的数据项的值再次等于 `"Six eggs"`：
 
 ```swift
 firstItem = shoppingList[0]
-// firstItem is now equal to "Six eggs"
+// firstItem 现在等于“Six eggs”
 ```
 
-<!--
-  - test: `arraysInferred`
-
-  ```swifttest
-  -> firstItem = shoppingList[0]
-  /> firstItem is now equal to \"\(firstItem)\"
-  </ firstItem is now equal to "Six eggs"
-  ```
--->
-
-If you want to remove the final item from an array,
-use the `removeLast()` method rather than the `remove(at:)` method
-to avoid the need to query the array's `count` property.
-Like the `remove(at:)` method, `removeLast()` returns the removed item:
+如果你只想把数组中的最后一项移除，可以使用 `removeLast()` 方法而不是 `remove(at:)` 方法来避免需要获取数组的 `count` 属性。就像后者一样，前者也会返回被移除的数据项：
 
 ```swift
 let apples = shoppingList.removeLast()
-// the last item in the array has just been removed
-// shoppingList now contains 5 items, and no apples
-// the apples constant is now equal to the removed "Apples" string
+//// 数组的最后一项被移除了
+// shoppingList 现在只有5项，不包括 Apples
+// apples 常量的值现在等于字符串“Apples”
 ```
 
-<!--
-  - test: `arraysInferred`
+### 数组的遍历
 
-  ```swifttest
-  -> let apples = shoppingList.removeLast()
-  // the last item in the array has just been removed
-  /> shoppingList now contains \(shoppingList.count) items, and no apples
-  </ shoppingList now contains 5 items, and no apples
-  /> the apples constant is now equal to the removed \"\(apples)\" string
-  </ the apples constant is now equal to the removed "Apples" string
-  ```
--->
-
-### Iterating Over an Array
-
-You can iterate over the entire set of values in an array with the `for`-`in` loop:
+你可以使用 `for-in` 循环来遍历数组中所有的数据项：
 
 ```swift
 for item in shoppingList {
@@ -527,31 +226,7 @@ for item in shoppingList {
 // Bananas
 ```
 
-<!--
-  - test: `arraysInferred`
-
-  ```swifttest
-  -> for item in shoppingList {
-        print(item)
-     }
-  </ Six eggs
-  </ Milk
-  </ Flour
-  </ Baking Powder
-  </ Bananas
-  ```
--->
-
-If you need the integer index of each item as well as its value,
-use the `enumerated()` method to iterate over the array instead.
-For each item in the array,
-the `enumerated()` method returns a tuple
-composed of an integer and the item.
-The integers start at zero and count up by one for each item;
-if you enumerate over a whole array,
-these integers match the items' indices.
-You can decompose the tuple into temporary constants or variables
-as part of the iteration:
+如果同时需要每个数据项的值和索引值，可以使用 `enumerated()` 方法来进行数组遍历。`enumerated()` 返回一个由索引值和数据值组成的元组数组。索引值从零开始，并且每次增加一；如果枚举一整个数组，索引值将会和数据值一一匹配。你可以把这个元组分解成临时常量或者变量来进行遍历：
 
 ```swift
 for (index, value) in shoppingList.enumerated() {
@@ -564,193 +239,99 @@ for (index, value) in shoppingList.enumerated() {
 // Item 5: Bananas
 ```
 
-<!--
-  - test: `arraysInferred`
+更多关于 for-in 循环的介绍请参见 <doc:ControlFlow#For-In-Loops>.
 
-  ```swifttest
-  -> for (index, value) in shoppingList.enumerated() {
-        print("Item \(index + 1): \(value)")
-     }
-  </ Item 1: Six eggs
-  </ Item 2: Milk
-  </ Item 3: Flour
-  </ Item 4: Baking Powder
-  </ Item 5: Bananas
-  ```
--->
+## 集合
 
-For more about the `for`-`in` loop, see <doc:ControlFlow#For-In-Loops>.
+*集合*用来存储相同类型并且没有确定顺序的值。当集合元素顺序不重要时或者希望确保每个元素只出现一次时可以使用集合而不是数组。
 
-## Sets
-
-A *set* stores distinct values of the same type
-in a collection with no defined ordering.
-You can use a set instead of an array when the order of items isn't important,
-or when you need to ensure that an item only appears once.
-
-> Note: Swift's `Set` type is bridged to Foundation's `NSSet` class.
+> 注意 Swift 的 `Set` 类型被桥接到 Foundation 中的 `NSSet` 类。
 >
-> For more information about using `Set` with Foundation and Cocoa,
-> see [Bridging Between Set and NSSet](https://developer.apple.com/documentation/swift/set#2845530).
+> 关于使用 Foundation 和 Cocoa 中 Set 的知识，参见 [Bridging Between Set and NSSet](https://developer.apple.com/documentation/swift/set#2845530).
 
-<!--
-  TODO: Add note about performance characteristics of contains on sets as opposed to arrays?
--->
+### 集合类型的哈希值
 
-### Hash Values for Set Types
+一个类型为了存储在集合中，该类型必须是*可哈希化*的——也就是说，该类型必须提供一个方法来计算它的*哈希值*。一个哈希值是 `Int` 类型的，相等的对象哈希值必须相同，比如 `a == b`,因此必须 `a.hashValue == b.hashValue` 。
 
-A type must be *hashable* in order to be stored in a set ---
-that is, the type must provide a way to compute a *hash value* for itself.
-A hash value is an `Int` value that's the same for all objects that compare equally,
-such that if `a == b`,
-the hash value of `a` is equal to the hash value of `b`.
+Swift 的所有基本类型（比如 String、Int、Double 和 Bool）默认都是可哈希化的，可以作为集合值的类型或者字典键的类型。没有关联值的枚举成员值(在 枚举 有讲述 <doc:Enumerations>)默认也是可哈希化的。
 
-All of Swift's basic types (such as `String`, `Int`, `Double`, and `Bool`)
-are hashable by default, and can be used as set value types or dictionary key types.
-Enumeration case values without associated values
-(as described in <doc:Enumerations>)
-are also hashable by default.
+> 注意
 
-> Note: You can use your own custom types as set value types or dictionary key types
-> by making them conform to the `Hashable` protocol
-> from the Swift standard library.
-> For information about implementing the required `hash(into:)` method,
-> see [`Hashable`](https://developer.apple.com/documentation/swift/hashable).
-> For information about conforming to protocols, see <doc:Protocols>.
+> 你可以使用自定义的类型作为集合值的类型或者是字典键的类型，但使用自定义类型需要遵循 Swift 标准库中的 `Hashable` 协议。遵循 `Hashable` 协议的类型需要提供一个类型为 `Int` 的可读属性 `hashValue`。由类型的 `hashValue` 属性返回的值不需要在同一程序的不同执行周期或者不同程序之间保持相同。
 
-### Set Type Syntax
+>因为 `Hashable` 协议遵循 `Equatable` 协议，所以遵循该协议的类型也必须提供一个“是否相等”运算符（`==`）的实现。这个 `Equatable` 协议要求任何遵循 `==` 实现的实例间都是一种相等的关系。也就是说，对于 `a,b,c` 三个值来说，`==` 的实现必须满足下面三种情况：
 
-The type of a Swift set is written as `Set<Element>`,
-where `Element` is the type that the set is allowed to store.
-Unlike arrays, sets don't have an equivalent shorthand form.
+> * a == a(自反性)
 
-### Creating and Initializing an Empty Set
+> * a == b 意味着 b == a(对称性)
 
-You can create an empty set of a certain type
-using initializer syntax:
+> * a == b && b == c 意味着 a == c(传递性)
 
+> 关于遵循协议的更多信息，请看 <doc:Protocols>.
+
+### 集合类型语法
+
+Swift 中的集合类型被写为 `Set<Element>`，这里的 `Element` 表示集合中允许存储的类型。和数组不同的是，集合没有等价的简化形式。
+
+### 创建和构造一个空的集合
+
+你可以通过构造器语法创建一个特定类型的空集合
 ```swift
 var letters = Set<Character>()
 print("letters is of type Set<Character> with \(letters.count) items.")
-// Prints "letters is of type Set<Character> with 0 items."
+// 打印 "letters is of type Set<Character> with 0 items."
 ```
 
-<!--
-  - test: `setsEmpty`
+> 注意
 
-  ```swifttest
-  -> var letters = Set<Character>()
-  -> print("letters is of type Set<Character> with \(letters.count) items.")
-  <- letters is of type Set<Character> with 0 items.
-  ```
--->
+> 通过构造器，这里 `letters` 变量的类型被推断为 `Set<Character>`。
 
-> Note: The type of the `letters` variable is inferred to be `Set<Character>`,
-> from the type of the initializer.
-
-Alternatively, if the context already provides type information,
-such as a function argument or an already typed variable or constant,
-you can create an empty set with an empty array literal:
+此外，如果上下文提供了类型信息，比如作为函数的参数或者已知类型的变量或常量，你可以通过一个空的数组字面量创建一个空的集合：
 
 ```swift
 letters.insert("a")
-// letters now contains 1 value of type Character
+// letters 现在含有1个 Character 类型的值
 letters = []
-// letters is now an empty set, but is still of type Set<Character>
+// letters 现在是一个空的 Set，但是它依然是 Set<Character> 类型
 ```
 
-<!--
-  - test: `setsEmpty`
+### 用数组字面量创建集合
 
-  ```swifttest
-  -> letters.insert("a")
-  /> letters now contains \(letters.count) value of type Character
-  </ letters now contains 1 value of type Character
-  -> letters = []
-  // letters is now an empty set, but is still of type Set<Character>
-  ```
--->
+你可以使用数组字面量来构造集合，相当于一种简化的形式将一个或者多个值作为集合元素。
 
-### Creating a Set with an Array Literal
-
-You can also initialize a set with an array literal,
-as a shorthand way to write one or more values as a set collection.
-
-The example below creates a set called `favoriteGenres` to store `String` values:
+下面的例子创建一个称之为 `favoriteGenres` 的集合来存储 `String` 类型的值：
 
 ```swift
 var favoriteGenres: Set<String> = ["Rock", "Classical", "Hip hop"]
-// favoriteGenres has been initialized with three initial items
+// favoriteGenres 被构造成含有三个初始值的集合
 ```
 
-<!--
-  - test: `sets`
+这个 `favoriteGenres` 变量被声明为“一个 `String` 值的集合”，写为 `Set<String>`。由于这个特定集合指定了值为 `String` 类型，所以它*只*允许存储 `String` 类型值。这里的 `favoriteGenres` 变量有三个 `String` 类型的初始值（`"Rock"`，`"Classical"` 和 `"Hip hop"`），以数组字面量的形式书写。
 
-  ```swifttest
-  -> var favoriteGenres: Set<String> = ["Rock", "Classical", "Hip hop"]
-  // favoriteGenres has been initialized with three initial items
-  ```
--->
+> 注意
 
-The `favoriteGenres` variable is declared as
-“a set of `String` values”, written as `Set<String>`.
-Because this particular set has specified a value type of `String`,
-it's *only* allowed to store `String` values.
-Here, the `favoriteGenres` set is initialized with three `String` values
-(`"Rock"`, `"Classical"`, and `"Hip hop"`), written within an array literal.
+> `favoriteGenres` 被声明为一个变量（拥有 `var` 标示符）而不是一个常量（拥有 `let` 标示符）,因为它里面的元素将会在之后的例子中被增加或者移除。
 
-> Note: The `favoriteGenres` set is declared as a variable (with the `var` introducer)
-> and not a constant (with the `let` introducer)
-> because items are added and removed in the examples below.
-
-A set type can't be inferred from an array literal alone,
-so the type `Set` must be explicitly declared.
-However, because of Swift's type inference,
-you don't have to write the type of the set's elements
-if you're initializing it with an array literal
-that contains values of just one type.
-The initialization of `favoriteGenres` could have been written in a shorter form instead:
+一个集合类型不能从数组字面量中被直接推断出来，因此 `Set` 类型必须显式声明。然而，由于 Swift 的类型推断功能，如果你想使用一个数组字面量构造一个集合并且与该数组字面量中的所有元素类型相同，那么无须写出集合的具体类型。`favoriteGenres` 的构造形式可以采用简化的方式代替：
 
 ```swift
 var favoriteGenres: Set = ["Rock", "Classical", "Hip hop"]
 ```
 
-<!--
-  - test: `setsInferred`
+由于数组字面量中的所有元素类型相同，Swift 可以推断出 `Set<String>` 作为 `favoriteGenres` 变量的正确类型。
 
-  ```swifttest
-  -> var favoriteGenres: Set = ["Rock", "Classical", "Hip hop"]
-  ```
--->
+### 访问和修改一个集合
 
-Because all values in the array literal are of the same type,
-Swift can infer that `Set<String>` is
-the correct type to use for the `favoriteGenres` variable.
+你可以通过集合的属性和方法来对其进行访问和修改。
 
-### Accessing and Modifying a Set
-
-You access and modify a set through its methods and properties.
-
-To find out the number of items in a set,
-check its read-only `count` property:
+为了获取一个集合中元素的数量，可以使用其只读属性 `count`：
 
 ```swift
 print("I have \(favoriteGenres.count) favorite music genres.")
-// Prints "I have 3 favorite music genres."
+// 打印 "I have 3 favorite music genres."
 ```
 
-<!--
-  - test: `setUsage`
-
-  ```swifttest
-  >> var favoriteGenres: Set = ["Rock", "Classical", "Hip hop"]
-  -> print("I have \(favoriteGenres.count) favorite music genres.")
-  <- I have 3 favorite music genres.
-  ```
--->
-
-Use the Boolean `isEmpty` property
-as a shortcut for checking whether the `count` property is equal to `0`:
+使用布尔属性 `isEmpty` 作为一个缩写形式去检查 `count` 属性是否为 `0`：
 
 ```swift
 if favoriteGenres.isEmpty {
@@ -758,44 +339,17 @@ if favoriteGenres.isEmpty {
 } else {
     print("I have particular music preferences.")
 }
-// Prints "I have particular music preferences."
+// 打印 "I have particular music preferences."
 ```
 
-<!--
-  - test: `setUsage`
-
-  ```swifttest
-  -> if favoriteGenres.isEmpty {
-        print("As far as music goes, I'm not picky.")
-     } else {
-        print("I have particular music preferences.")
-     }
-  <- I have particular music preferences.
-  ```
--->
-
-You can add a new item into a set by calling the set's `insert(_:)` method:
+你可以通过调用集合的 `insert(_:)` 方法来添加一个新元素：
 
 ```swift
 favoriteGenres.insert("Jazz")
-// favoriteGenres now contains 4 items
+// favoriteGenres 现在包含4个元素
 ```
 
-<!--
-  - test: `setUsage`
-
-  ```swifttest
-  -> favoriteGenres.insert("Jazz")
-  /> favoriteGenres now contains \(favoriteGenres.count) items
-  </ favoriteGenres now contains 4 items
-  ```
--->
-
-You can remove an item from a set by calling the set's `remove(_:)` method,
-which removes the item if it's a member of the set,
-and returns the removed value,
-or returns `nil` if the set didn't contain it.
-Alternatively, all items in a set can be removed with its `removeAll()` method.
+你可以通过调用集合的 `remove(_:)` 方法去删除一个元素，如果它是该集合的一个元素则删除它并且返回它的值，若该集合不包含它，则返回 `nil`。另外，集合可以通过 `removeAll()` 方法删除所有元素。
 
 ```swift
 if let removedGenre = favoriteGenres.remove("Rock") {
@@ -803,23 +357,10 @@ if let removedGenre = favoriteGenres.remove("Rock") {
 } else {
     print("I never much cared for that.")
 }
-// Prints "Rock? I'm over it."
+// 打印 "Rock? I'm over it."
 ```
 
-<!--
-  - test: `setUsage`
-
-  ```swifttest
-  -> if let removedGenre = favoriteGenres.remove("Rock") {
-        print("\(removedGenre)? I'm over it.")
-     } else {
-        print("I never much cared for that.")
-     }
-  <- Rock? I'm over it.
-  ```
--->
-
-To check whether a set contains a particular item, use the `contains(_:)` method.
+使用 `contains(_:)` 方法去检查集合中是否包含一个特定的值：
 
 ```swift
 if favoriteGenres.contains("Funk") {
@@ -827,25 +368,12 @@ if favoriteGenres.contains("Funk") {
 } else {
     print("It's too funky in here.")
 }
-// Prints "It's too funky in here."
+// 打印 "It's too funky in here."
 ```
 
-<!--
-  - test: `setUsage`
+### 遍历一个集合
 
-  ```swifttest
-  -> if favoriteGenres.contains("Funk") {
-         print("I get up on the good foot.")
-     } else {
-         print("It's too funky in here.")
-     }
-  <- It's too funky in here.
-  ```
--->
-
-### Iterating Over a Set
-
-You can iterate over the values in a set with a `for`-`in` loop.
+Y你可以在一个 `for-in` 循环中遍历一个集合中的所有值。
 
 ```swift
 for genre in favoriteGenres {
@@ -856,67 +384,33 @@ for genre in favoriteGenres {
 // Hip hop
 ```
 
-<!--
-  - test: `setUsage`
+更多关于 `for-in` 循环的信息，参见 <doc:ControlFlow#For-In-Loops>.
 
-  ```swifttest
-  -> for genre in favoriteGenres {
-        print("\(genre)")
-     }
-  </ Classical
-  </ Jazz
-  </ Hip hop
-  ```
--->
-
-For more about the `for`-`in` loop, see <doc:ControlFlow#For-In-Loops>.
-
-Swift's `Set` type doesn't have a defined ordering.
-To iterate over the values of a set in a specific order,
-use the `sorted()` method,
-which returns the set's elements as an array
-sorted using the `<` operator.
+Swift 的 `Set` 类型没有确定的顺序，为了按照特定顺序来遍历一个集合中的值可以使用 `sorted()` 方法，它将返回一个有序数组，这个数组的元素排列顺序由操作符 `<` 对元素进行比较的结果来确定。
 
 ```swift
 for genre in favoriteGenres.sorted() {
     print("\(genre)")
 }
 // Classical
-// Hip hop
 // Jazz
+// Hip hop
 ```
 
-<!--
-  - test: `setUsage`
+## 集合操作
 
-  ```swifttest
-  -> for genre in favoriteGenres.sorted() {
-        print("\(genre)")
-     }
-  </ Classical
-  </ Hip hop
-  </ Jazz
-  ```
--->
+你可以高效地完成集合的一些基本操作，比如把两个集合组合到一起，判断两个集合共有元素，或者判断两个集合是否全包含，部分包含或者不相交。
 
-## Performing Set Operations
+### 基本集合操作
 
-You can efficiently perform fundamental set operations,
-such as combining two sets together,
-determining which values two sets have in common,
-or determining whether two sets contain all, some, or none of the same values.
-
-### Fundamental Set Operations
-
-The illustration below depicts two sets --- `a` and `b` ---
-with the results of various set operations represented by the shaded regions.
+下面的插图描述了两个集合 `a` 和 `b`，以及通过阴影部分的区域显示集合各种操作的结果。
 
 ![](setVennDiagram)
 
-- Use the `intersection(_:)` method to create a new set with only the values common to both sets.
-- Use the `symmetricDifference(_:)` method to create a new set with values in either set, but not both.
-- Use the `union(_:)` method to create a new set with all of the values in both sets.
-- Use the `subtracting(_:)` method to create a new set with values not in the specified set.
+- 使用 `intersection(_:)` 方法根据两个集合的交集创建一个新的集合。
+- 使用 `symmetricDifference(_:)` 方法根据两个集合不相交的值创建一个新的集合。
+- 使用 `union(_:)` 方法根据两个集合的所有值创建一个新的集合。
+- 使用 `subtracting(_:)` 方法根据不在另一个集合中的值创建一个新的集合。
 
 ```swift
 let oddDigits: Set = [1, 3, 5, 7, 9]
@@ -933,56 +427,17 @@ oddDigits.symmetricDifference(singleDigitPrimeNumbers).sorted()
 // [1, 2, 9]
 ```
 
-<!--
-  - test: `setOperations`
+### 集合成员关系和相等
 
-  ```swifttest
-  -> let oddDigits: Set = [1, 3, 5, 7, 9]
-  -> let evenDigits: Set = [0, 2, 4, 6, 8]
-  -> let singleDigitPrimeNumbers: Set = [2, 3, 5, 7]
-  ---
-  >> let a =
-  -> oddDigits.union(evenDigits).sorted()
-  >> assert(a == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-  // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-  >> let b =
-  -> oddDigits.intersection(evenDigits).sorted()
-  >> assert(b == [])
-  // []
-  >> let c =
-  -> oddDigits.subtracting(singleDigitPrimeNumbers).sorted()
-  >> assert(c == [1, 9])
-  // [1, 9]
-  >> let d =
-  -> oddDigits.symmetricDifference(singleDigitPrimeNumbers).sorted()
-  >> assert(d == [1, 2, 9])
-  // [1, 2, 9]
-  ```
--->
-
-<!--
-  Rewrite the above to avoid bare expressions.
-  Tracking bug is <rdar://problem/35301593>
--->
-
-### Set Membership and Equality
-
-The illustration below depicts three sets --- `a`, `b` and `c` ---
-with overlapping regions representing elements shared among sets.
-Set `a` is a *superset* of set `b`,
-because `a` contains all elements in `b`.
-Conversely, set `b` is a *subset* of set `a`,
-because all elements in `b` are also contained by `a`.
-Set `b` and set `c` are *disjoint* with one another,
-because they share no elements in common.
+下面的插图描述了三个集合 `a`、`b` 和 `c`，以及通过重叠区域表述集合间共享的元素。集合 `a` 是集合 `b `的父集合，因为 `a `包含了 `b` 中所有的元素。相反的，集合 `b` 是集合 `a` 的子集合，因为属于 `b` 的元素也被 `a`包含。集合 `b` 和集合 `c` 是不相交的，因为它们之间没有共同的元素。
 
 ![](setEulerDiagram)
 
-- Use the “is equal” operator (`==`) to determine whether two sets contain all of the same values.
-- Use the `isSubset(of:)` method to determine whether all of the values of a set are contained in the specified set.
-- Use the `isSuperset(of:)` method to determine whether a set contains all of the values in a specified set.
-- Use the `isStrictSubset(of:)` or `isStrictSuperset(of:)` methods to determine whether a set is a subset or superset, but not equal to, a specified set.
-- Use the `isDisjoint(with:)` method to determine whether two sets have no values in common.
+- 使用“是否相等”运算符 (`==`) 来判断两个集合包含的值是否全部相同。
+- 使用 `isSubset(of:)` 方法来判断一个集合中的所有值是否都被另一个集合包含。
+- 使用 `isSuperset(of:)` 方法来判断一个集合是否包含另一个集合中的所有值。
+- 使用 `isStrictSubset(of:)` 或 `isStrictSuperset(of:)` 方法来判断一个集合是否是另一个集合的子集合或父集合，但并不相等。
+- 使用 `isDisjoint(with:)` 方法来判断两个集合是否没有共同的元素。
 
 ```swift
 let houseAnimals: Set = ["🐶", "🐱"]
@@ -997,210 +452,93 @@ farmAnimals.isDisjoint(with: cityAnimals)
 // true
 ```
 
-<!--
-  - test: `setOperations`
 
-  ```swifttest
-  -> let houseAnimals: Set = ["🐶", "🐱"]
-  -> let farmAnimals: Set = ["🐮", "🐔", "🐑", "🐶", "🐱"]
-  -> let cityAnimals: Set = ["🐦", "🐭"]
-  ---
-  >> let aa =
-  -> houseAnimals.isSubset(of: farmAnimals)
-  >> assert(aa == true)
-  // true
-  >> let bb =
-  -> farmAnimals.isSuperset(of: houseAnimals)
-  >> assert(bb == true)
-  // true
-  >> let cc =
-  -> farmAnimals.isDisjoint(with: cityAnimals)
-  >> assert(cc == true)
-  // true
-  ```
--->
+## 字典
 
-<!--
-  Rewrite the above to avoid bare expressions.
-  Tracking bug is <rdar://problem/35301593>
--->
+*字典*是一种无序的集合，它存储的是键值对之间的关系，其所有键的值需要是相同的类型，所有值的类型也需要相同。每个值（value）都关联唯一的键（key），键作为字典中这个值数据的标识符。和数组中的数据项不同，字典中的数据项并没有具体顺序。你在需要通过标识符（键）访问数据的时候使用字典，这种方法很大程度上和在现实世界中使用字典查字义的方法一样。
 
-## Dictionaries
+> 注意
 
-A *dictionary* stores associations between
-keys of the same type and values of the same type
-in a collection with no defined ordering.
-Each value is associated with a unique *key*,
-which acts as an identifier for that value within the dictionary.
-Unlike items in an array, items in a dictionary don't have a specified order.
-You use a dictionary when you need to look up values based on their identifier,
-in much the same way that a real-world dictionary is used to look up
-the definition for a particular word.
+> Swift 的 Dictionary 类型被桥接到 Foundation 的 NSDictionary 类。
 
-> Note: Swift's `Dictionary` type is bridged to Foundation's `NSDictionary` class.
->
-> For more information about using `Dictionary` with Foundation and Cocoa,
-> see [Bridging Between Dictionary and NSDictionary](https://developer.apple.com/documentation/swift/dictionary#2846239).
+> 更多关于在 Foundation 和 Cocoa 中使用 Dictionary 类型的信息，参见[Bridging Between Dictionary and NSDictionary](https://developer.apple.com/documentation/swift/dictionary#2846239).
 
-### Dictionary Type Shorthand Syntax
+### 字典类型简化语法
 
-The type of a Swift dictionary is written in full as `Dictionary<Key, Value>`,
-where `Key` is the type of value that can be used as a dictionary key,
-and `Value` is the type of value that the dictionary stores for those keys.
+Swift 的字典使用 `Dictionary<Key, Value>` 定义，其中 `Key` 是一种可以在字典中被用作键的类型，`Value` 是字典中对应于这些键所存储值的数据类型。
 
-> Note: A dictionary `Key` type must conform to the `Hashable` protocol,
-> like a set's value type.
+> 注意
 
-You can also write the type of a dictionary in shorthand form as `[Key: Value]`.
-Although the two forms are functionally identical,
-the shorthand form is preferred
-and is used throughout this guide when referring to the type of a dictionary.
+> 一个字典的 `Key` 类型必须遵循 `Hashable` 协议，就像 `Set` 的值类型。
 
-### Creating an Empty Dictionary
+你也可以用 `[Key: Value]` 这样简化的形式去表示字典类型。虽然这两种形式功能上相同，但是后者是首选，并且本教程中涉及到字典类型时通篇采用后者。
 
-As with arrays,
-you can create an empty `Dictionary` of a certain type by using initializer syntax:
+### 创建一个空字典
+
+你可以像数组一样使用构造语法创建一个拥有确定类型的空字典：
 
 ```swift
 var namesOfIntegers: [Int: String] = [:]
-// namesOfIntegers is an empty [Int: String] dictionary
+// namesOfIntegers 是一个空的 [Int: String] 字典
 ```
 
-<!--
-  - test: `dictionariesEmpty`
+这个例子创建了一个 `[Int: String]` 类型的空字典来储存整数的英语命名。它的键是 `Int` 型，值是 `String` 型。
 
-  ```swifttest
-  -> var namesOfIntegers: [Int: String] = [:]
-  // namesOfIntegers is an empty [Int: String] dictionary
-  ```
--->
-
-This example creates an empty dictionary of type `[Int: String]`
-to store human-readable names of integer values.
-Its keys are of type `Int`, and its values are of type `String`.
-
-If the context already provides type information,
-you can create an empty dictionary with an empty dictionary literal,
-which is written as `[:]`
-(a colon inside a pair of square brackets):
+如果上下文已经提供了类型信息，你可以使用空字典字面量来创建一个空字典，记作 `[:]` （一对方括号中放一个冒号）：
 
 ```swift
 namesOfIntegers[16] = "sixteen"
-// namesOfIntegers now contains 1 key-value pair
+// namesOfIntegers 现在包含一个键值对
 namesOfIntegers = [:]
-// namesOfIntegers is once again an empty dictionary of type [Int: String]
+// namesOfIntegers 又成为了一个 [Int: String] 类型的空字典
 ```
 
-<!--
-  - test: `dictionariesEmpty`
+### 用字典字面量创建字典
 
-  ```swifttest
-  -> namesOfIntegers[16] = "sixteen"
-  /> namesOfIntegers now contains \(namesOfIntegers.count) key-value pair
-  </ namesOfIntegers now contains 1 key-value pair
-  -> namesOfIntegers = [:]
-  // namesOfIntegers is once again an empty dictionary of type [Int: String]
-  ```
--->
+你可以使用*字典字面量*来构造字典，这和刚才介绍过的数组字面量拥有相似语法。字典字面量是一种将一个或多个键值对写作 `Dictionary` 集合的快捷途径。
 
-### Creating a Dictionary with a Dictionary Literal
-
-You can also initialize a dictionary with a *dictionary literal*,
-which has a similar syntax to the array literal seen earlier.
-A dictionary literal is a shorthand way to write
-one or more key-value pairs as a `Dictionary` collection.
-
-A *key-value pair* is a combination of a key and a value.
-In a dictionary literal,
-the key and value in each key-value pair are separated by a colon.
-The key-value pairs are written as a list, separated by commas,
-surrounded by a pair of square brackets:
+一个*键值对*是一个键和一个值的结合体。在字典字面量中，每一个键值对的键和值都由冒号分割。这些键值对构成一个列表，其中这些键值对由逗号分割、并整体被包裹在一对方括号中：
 
 ```swift
 [<#key 1#>: <#value 1#>, <#key 2#>: <#value 2#>, <#key 3#>: <#value 3#>]
 ```
 
-The example below creates a dictionary to store the names of international airports.
-In this dictionary, the keys are three-letter International Air Transport Association codes,
-and the values are airport names:
+下面的例子创建了一个存储国际机场名称的字典。在这个字典中键是三个字母的国际航空运输相关代码，值是机场名称：
 
 ```swift
 var airports: [String: String] = ["YYZ": "Toronto Pearson", "DUB": "Dublin"]
 ```
 
-<!--
-  - test: `dictionaries`
+`airports` 字典被声明为一种 `[String: String]` 类型，这意味着这个字典的键和值都是 `String` 类型。
 
-  ```swifttest
-  -> var airports: [String: String] = ["YYZ": "Toronto Pearson", "DUB": "Dublin"]
-  ```
--->
+> 注意
 
-The `airports` dictionary is declared as having a type of `[String: String]`,
-which means “a `Dictionary` whose keys are of type `String`,
-and whose values are also of type `String`”.
+> `airports` 字典被声明为变量（用 `var` 关键字）而不是常量（用 `let` 关键字）因为后面会有更多的机场信息被添加到这个字典中。
 
-> Note: The `airports` dictionary is declared as a variable (with the `var` introducer),
-> and not a constant (with the `let` introducer),
-> because more airports are added to the dictionary in the examples below.
+`airports` 字典使用字典字面量初始化，包含两个键值对。第一对的键是 `YYZ`，值是 `Toronto Pearson` 。第二对的键是 `DUB`，值是 `Dublin` 。
 
-The `airports` dictionary is initialized with
-a dictionary literal containing two key-value pairs.
-The first pair has a key of `"YYZ"` and a value of `"Toronto Pearson"`.
-The second pair has a key of `"DUB"` and a value of `"Dublin"`.
+这个字典语句包含了两个 `String: String` 类型的键值对。它们对应 `airports` 变量声明的类型（一个只有 `String` 键和 `String` 值的字典），所以这个字典字面量的赋值是一种方式用来构造拥有两个初始数据项的 `airports` 字典。
 
-This dictionary literal contains two `String: String` pairs.
-This key-value type matches the type of the `airports` variable declaration
-(a dictionary with only `String` keys, and only `String` values),
-and so the assignment of the dictionary literal is permitted
-as a way to initialize the `airports` dictionary with two initial items.
-
-As with arrays,
-you don't have to write the type of the dictionary
-if you're initializing it with a dictionary literal whose keys and values have consistent types.
-The initialization of `airports` could have been written in a shorter form instead:
+和数组一样，你在用字典字面量构造字典时，如果它的键和值都有各自一致的类型，那么就不必写出字典的类型。 `airports` 字典也可以用这种简短方式定义：
 
 ```swift
 var airports = ["YYZ": "Toronto Pearson", "DUB": "Dublin"]
 ```
 
-<!--
-  - test: `dictionariesInferred`
+因为这个语句中所有的键和值都各自拥有相同的数据类型，Swift 可以推断出 `[String: String]` 是 `airports` 字典的正确类型。
 
-  ```swifttest
-  -> var airports = ["YYZ": "Toronto Pearson", "DUB": "Dublin"]
-  ```
--->
+### 访问和修改字典
 
-Because all keys in the literal are of the same type as each other,
-and likewise all values are of the same type as each other,
-Swift can infer that `[String: String]` is
-the correct type to use for the `airports` dictionary.
+你可以通过字典的方法和属性来访问和修改字典，或者通过使用下标语法。
 
-### Accessing and Modifying a Dictionary
-
-You access and modify a dictionary through its methods and properties,
-or by using subscript syntax.
-
-As with an array, you find out the number of items in a `Dictionary`
-by checking its read-only `count` property:
+和数组一样，可以通过 `Dictionary` 的只读属性 `count` 来获取字典的数据项数量：
 
 ```swift
 print("The airports dictionary contains \(airports.count) items.")
-// Prints "The airports dictionary contains 2 items."
+// 打印 "The airports dictionary contains 2 items." 这个字典有两个数据项）
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> print("The airports dictionary contains \(airports.count) items.")
-  <- The airports dictionary contains 2 items.
-  ```
--->
-
-Use the Boolean `isEmpty` property
-as a shortcut for checking whether the `count` property is equal to `0`:
+使用布尔属性 `isEmpty` 作为一个缩写形式去检查 `count` 属性是否为 `0`：
 
 ```swift
 if airports.isEmpty {
@@ -1208,100 +546,35 @@ if airports.isEmpty {
 } else {
     print("The airports dictionary isn't empty.")
 }
-// Prints "The airports dictionary isn't empty."
+// 打印 "The airports dictionary isn't empty."
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> if airports.isEmpty {
-        print("The airports dictionary is empty.")
-     } else {
-        print("The airports dictionary isn't empty.")
-     }
-  <- The airports dictionary isn't empty.
-  ```
--->
-
-You can add a new item to a dictionary with subscript syntax.
-Use a new key of the appropriate type as the subscript index,
-and assign a new value of the appropriate type:
+你可以通过下标语法来给字典添加新的数据项。可以使用一个恰当类型的键作为下标索引，并且分配恰当类型的新值：
 
 ```swift
 airports["LHR"] = "London"
-// the airports dictionary now contains 3 items
+//  airports 字典现在有三个数据项
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> airports["LHR"] = "London"
-  /> the airports dictionary now contains \(airports.count) items
-  </ the airports dictionary now contains 3 items
-  ```
--->
-
-You can also use subscript syntax to change the value associated with a particular key:
+也可以使用下标语法来改变特定键对应的值：
 
 ```swift
 airports["LHR"] = "London Heathrow"
-// the value for "LHR" has been changed to "London Heathrow"
+// “LHR”对应的值被改为“London Heathrow”
 ```
 
-<!--
-  - test: `dictionariesInferred`
+作为一种替代下标语法的方式，字典的 `updateValue(_:forKey:)` 方法可以设置或者更新特定键对应的值。就像上面所示的下标示例，`updateValue(_:forKey:)` 方法在这个键不存在对应值的时候会设置新值或者在存在时更新已存在的值。和下标的方式不同，`updateValue(_:forKey:)` 这个方法返回更新值之前的原值。这样使得你可以检查更新是否成功。
 
-  ```swifttest
-  -> airports["LHR"] = "London Heathrow"
-  /> the value for \"LHR\" has been changed to \"\(airports["LHR"]!)\"
-  </ the value for "LHR" has been changed to "London Heathrow"
-  ```
--->
-
-As an alternative to subscripting,
-use a dictionary's `updateValue(_:forKey:)` method
-to set or update the value for a particular key.
-Like the subscript examples above, the `updateValue(_:forKey:)` method
-sets a value for a key if none exists,
-or updates the value if that key already exists.
-Unlike a subscript, however,
-the `updateValue(_:forKey:)` method returns the *old* value after performing an update.
-This enables you to check whether or not an update took place.
-
-The `updateValue(_:forKey:)` method returns an optional value
-of the dictionary's value type.
-For a dictionary that stores `String` values, for example,
-the method returns a value of type `String?`,
-or “optional `String`”.
-This optional value contains the old value for that key if one existed before the update,
-or `nil` if no value existed:
+`updateValue(_:forKey:)` 方法会返回对应值类型的可选类型。举例来说：对于存储 `String` 值的字典，这个函数会返回一个 `String?` 或者“可选 `String`”类型的值。如果有值存在于更新前，则这个可选值包含了旧值，否则它将会是 `nil` ：
 
 ```swift
 if let oldValue = airports.updateValue("Dublin Airport", forKey: "DUB") {
     print("The old value for DUB was \(oldValue).")
 }
-// Prints "The old value for DUB was Dublin."
+//  输出 "The old value for DUB was Dublin."
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> if let oldValue = airports.updateValue("Dublin Airport", forKey: "DUB") {
-        print("The old value for DUB was \(oldValue).")
-     }
-  <- The old value for DUB was Dublin.
-  ```
--->
-
-You can also use subscript syntax to retrieve a value from the dictionary for a particular key.
-Because it's possible to request a key for which no value exists,
-a dictionary's subscript returns an optional value of the dictionary's value type.
-If the dictionary contains a value for the requested key,
-the subscript returns an optional value containing the existing value for that key.
-Otherwise, the subscript returns `nil`:
+你也可以使用下标语法来在字典中检索特定键对应的值。因为有可能请求的键没有对应的值存在，字典的下标访问会返回对应值类型的可选类型。如果这个字典包含请求键所对应的值，下标会返回一个包含这个存在值的可选类型，否则将返回  `nil` ： 
 
 ```swift
 if let airportName = airports["DUB"] {
@@ -1309,55 +582,19 @@ if let airportName = airports["DUB"] {
 } else {
     print("That airport isn't in the airports dictionary.")
 }
-// Prints "The name of the airport is Dublin Airport."
+//  打印 "The name of the airport is Dublin Airport."
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> if let airportName = airports["DUB"] {
-        print("The name of the airport is \(airportName).")
-     } else {
-        print("That airport isn't in the airports dictionary.")
-     }
-  <- The name of the airport is Dublin Airport.
-  ```
--->
-
-You can use subscript syntax to remove a key-value pair from a dictionary
-by assigning a value of `nil` for that key:
+还可以使用下标语法通过将某个键的对应值赋值为 `nil` 来从字典里移除一个键值对：
 
 ```swift
 airports["APL"] = "Apple International"
-// "Apple International" isn't the real airport for APL, so delete it
+// "Apple International" 不是真的 APL 机场，删除它
 airports["APL"] = nil
-// APL has now been removed from the dictionary
+// APL 现在被移除了
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> airports["APL"] = "Apple International"
-  // "Apple International" isn't the real airport for APL, so delete it
-  -> airports["APL"] = nil
-  // APL has now been removed from the dictionary
-  >> if let deletedName = airports["APL"] {
-  >>    print("The key-value pair for APL has *not* been deleted, but it should have been!")
-  >>    print("It still has a value of \(deletedName)")
-  >> } else {
-  >>    print("APL has now been removed from the dictionary")
-  >> }
-  << APL has now been removed from the dictionary
-  ```
--->
-
-Alternatively, remove a key-value pair from a dictionary
-with the `removeValue(forKey:)` method.
-This method removes the key-value pair if it exists
-and returns the removed value,
-or returns `nil` if no value existed:
+此外，`removeValue(forKey:)` 方法也可以用来在字典中移除键值对。这个方法在键值对存在的情况下会移除该键值对并且返回被移除的值或者在没有对应值的情况下返回 `nil`：
 
 ```swift
 if let removedValue = airports.removeValue(forKey: "DUB") {
@@ -1365,28 +602,12 @@ if let removedValue = airports.removeValue(forKey: "DUB") {
 } else {
     print("The airports dictionary doesn't contain a value for DUB.")
 }
-// Prints "The removed airport's name is Dublin Airport."
+// 打印 "The removed airport's name is Dublin Airport."
 ```
 
-<!--
-  - test: `dictionariesInferred`
+### 字典遍历
 
-  ```swifttest
-  -> if let removedValue = airports.removeValue(forKey: "DUB") {
-        print("The removed airport's name is \(removedValue).")
-     } else {
-        print("The airports dictionary doesn't contain a value for DUB.")
-     }
-  <- The removed airport's name is Dublin Airport.
-  ```
--->
-
-### Iterating Over a Dictionary
-
-You can iterate over the key-value pairs in a dictionary with a `for`-`in` loop.
-Each item in the dictionary is returned as a `(key, value)` tuple,
-and you can decompose the tuple's members into temporary constants or variables
-as part of the iteration:
+你可以使用 `for-in` 循环来遍历某个字典中的键值对。每一个字典中的数据项都以 `(key, value)` 元组形式返回，并且可以使用临时常量或者变量来分解这些元组：
 
 ```swift
 for (airportCode, airportName) in airports {
@@ -1396,22 +617,9 @@ for (airportCode, airportName) in airports {
 // YYZ: Toronto Pearson
 ```
 
-<!--
-  - test: `dictionariesInferred`
+更多关于 `for-in` 循环的信息，参见 <doc:ControlFlow#For-In-Loops>.
 
-  ```swifttest
-  -> for (airportCode, airportName) in airports {
-        print("\(airportCode): \(airportName)")
-     }
-  </ LHR: London Heathrow
-  </ YYZ: Toronto Pearson
-  ```
--->
-
-For more about the `for`-`in` loop, see <doc:ControlFlow#For-In-Loops>.
-
-You can also retrieve an iterable collection of a dictionary's keys or values
-by accessing its `keys` and `values` properties:
+通过访问 `keys` 或者 `values` 属性，你也可以遍历字典的键或者值：
 
 ```swift
 for airportCode in airports.keys {
@@ -1427,27 +635,7 @@ for airportName in airports.values {
 // Airport name: Toronto Pearson
 ```
 
-<!--
-  - test: `dictionariesInferred`
-
-  ```swifttest
-  -> for airportCode in airports.keys {
-        print("Airport code: \(airportCode)")
-     }
-  </ Airport code: LHR
-  </ Airport code: YYZ
-  ---
-  -> for airportName in airports.values {
-        print("Airport name: \(airportName)")
-     }
-  </ Airport name: London Heathrow
-  </ Airport name: Toronto Pearson
-  ```
--->
-
-If you need to use a dictionary's keys or values
-with an API that takes an `Array` instance, initialize a new array
-with the `keys` or `values` property:
+如果你需要使用某个字典的键集合或者值集合来作为某个接受 `Array` 实例的 API 的参数，可以直接使用 `keys` 或者 `values` 属性构造一个新数组：
 
 ```swift
 let airportCodes = [String](airports.keys)
@@ -1457,36 +645,14 @@ let airportNames = [String](airports.values)
 // airportNames is ["London Heathrow", "Toronto Pearson"]
 ```
 
-<!--
-  - test: `dictionariesInferred`
 
-  ```swifttest
-  -> let airportCodes = [String](airports.keys)
-  /> airportCodes is [\"\(airportCodes[0])\", \"\(airportCodes[1])\"]
-  </ airportCodes is ["LHR", "YYZ"]
-  ---
-  -> let airportNames = [String](airports.values)
-  /> airportNames is [\"\(airportNames[0])\", \"\(airportNames[1])\"]
-  </ airportNames is ["London Heathrow", "Toronto Pearson"]
-  ```
--->
 
-Swift's `Dictionary` type doesn't have a defined ordering.
-To iterate over the keys or values of a dictionary in a specific order,
-use the `sorted()` method on its `keys` or `values` property.
+Swift 的 `Dictionary` 是无序集合类型。为了以特定的顺序遍历字典的键或值，可以对字典的 `keys` 或 `values` 属性使用 `sorted()` 方法。
 
-> Beta Software:
+> 测试版软件：
 >
-> This documentation contains preliminary information about an API or technology in development. This information is subject to change, and software implemented according to this documentation should be tested with final operating system software.
+> 此文档包含有关正在开发的 API 或技术的初步信息。这些信息可能会发生变化，按照此文档实现的软件应在最终操作系统软件下进行测试。
 >
-> Learn more about using [Apple's beta software](https://developer.apple.com/support/beta-software/).
+> 了解更多关于使用的内容[Apple's beta software](https://developer.apple.com/support/beta-software/)。
 
-<!--
-This source file is part of the Swift.org open source project
 
-Copyright (c) 2014 - 2022 Apple Inc. and the Swift project authors
-Licensed under Apache License v2.0 with Runtime Library Exception
-
-See https://swift.org/LICENSE.txt for license information
-See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
--->
